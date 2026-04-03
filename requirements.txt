@@ -1,0 +1,16 @@
+langchain
+langchain-google-genai
+langchain-community
+langchain-text-splitters
+faiss-cpu
+streamlit
+pandas
+plotly
+scipy
+scikit-learn
+statsmodels
+python-dotenv
+requests
+google-generativeai
+pydantic
+sentence-transformers
