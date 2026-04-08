@@ -22,7 +22,7 @@ st.set_page_config(page_title="나만의 커리어 비서", page_icon=None, layo
 
 # 세션 상태 초기화 (탭 상태 관리)
 if "active_tab" not in st.session_state:
-    st.session_state.active_tab = "시장 현황"
+    st.session_state.active_tab = "📌 인사이트"
 
 # Kaggle 설문 데이터 기반 분석기 로드 (탭2용)
 @st.cache_resource
@@ -194,10 +194,276 @@ if "messages" not in st.session_state: st.session_state.messages = []
 st.markdown("<div class='header-container'><div class='ai-badge'><div class='pulse-dot'></div>AI 기반 실시간 분석</div><h1 class='main-title'>나만의 커리어 비서</h1><p class='sub-title'>데이터 기반의 스마트 채용 분석 플랫폼</p></div>", unsafe_allow_html=True)
 
 # 탭 내비게이션
-tabs = ["시장 현황", "데이터 분석가 리포트", "커리어 검색"]
+tabs = ["📌 인사이트", "시장 현황", "데이터 분석가 리포트", "커리어 검색"]
+if st.session_state.active_tab not in tabs:
+    st.session_state.active_tab = "📌 인사이트"
 st.radio("", tabs, horizontal=True, label_visibility="collapsed", key="active_tab", index=tabs.index(st.session_state.active_tab))
 
-if st.session_state.active_tab == "시장 현황":
+# ============================================================
+# 📌 인사이트 브리핑 탭 (진입 첫 화면)
+# ============================================================
+if st.session_state.active_tab == "📌 인사이트":
+    # ---------- 히어로 ----------
+    st.markdown("""
+    <div style="padding:20px 26px;border-radius:14px;
+                background:linear-gradient(135deg,#1a1f4a 0%,#2d1b69 100%);
+                border:1px solid rgba(255,255,255,0.08);margin-bottom:18px;">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div style="font-size:24px;font-weight:800;color:#fff;">
+                🧭 Career-Insight
+            </div>
+            <div style="font-size:14px;color:#AFA9EC;letter-spacing:1px;">
+                데이터 직군, 지금 어디로 가야 하는가?에 데이터로 답하는 커리어 나침반
+            </div>
+        </div>
+        <div style="font-size:14px;color:#c9d1e8;margin-top:8px;line-height:1.6;">
+            국내 최대 채용 공고 사이트 크롤링 + Kaggle 글로벌 <b style="color:#fff;">4,390명</b> 설문 + <b style="color:#AFA9EC;">RAG 기반 AI 검색</b>을 한 화면에서.
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # ---------- 4×4 매트릭스 테이블 ----------
+    C_MARKET = "#638cff"
+    C_REPORT = "#34d399"
+    C_SEARCH = "#fbbf24"
+
+    td_base = (
+        "padding:18px 20px;vertical-align:top;"
+        "border:1px solid rgba(255,255,255,0.08);"
+        "background:rgba(255,255,255,0.03);"
+    )
+    td_label = (
+        "padding:18px 20px;vertical-align:top;"
+        "border:1px solid rgba(255,255,255,0.08);"
+        "background:rgba(175,169,236,0.08);"
+        "width:14%;"
+    )
+
+    def _header_cell(icon, title, color, question):
+        return (
+            f'<td style="{td_base}border-top:3px solid {color};width:28.6%;">'
+            f'<div style="font-size:34px;line-height:1;">{icon}</div>'
+            f'<div style="font-size:24px;font-weight:800;color:{color};margin:10px 0 6px 0;letter-spacing:-0.5px;">{title}</div>'
+            f'<div style="color:#c9d1e8;font-size:14px;font-style:italic;line-height:1.5;">{question}</div>'
+            f'</td>'
+        )
+
+    def _label_cell(icon, text):
+        return (
+            f'<td style="{td_label}">'
+            f'<div style="font-size:22px;">{icon}</div>'
+            f'<div style="color:#fff;font-size:17px;font-weight:800;margin-top:6px;line-height:1.3;">{text}</div>'
+            f'</td>'
+        )
+
+    def _content_cell(html_content, color=None, bold=False):
+        weight = "600" if bold else "400"
+        col = color if color else "#c9d1e8"
+        return (
+            f'<td style="{td_base}">'
+            f'<div style="color:{col};font-size:14.5px;line-height:1.85;font-weight:{weight};">{html_content}</div>'
+            f'</td>'
+        )
+
+    table_html = (
+        '<table style="width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;">'
+        '<tr>'
+        f'{_label_cell("🗂️", "기능")}'
+        f'{_header_cell("📊", "시장 현황", C_MARKET, "지금 국내 채용 시장은 어떻게 움직이는가?")}'
+        f'{_header_cell("📑", "DA 리포트", C_REPORT, "내 시장 가치는 글로벌 기준으로 얼마인가?")}'
+        f'{_header_cell("🤖", "AI 커리어 검색", C_SEARCH, "내 조건에 맞는 공고는 어디에 있는가?")}'
+        '</tr>'
+        '<tr>'
+        f'{_label_cell("🔧", "자동화 기능")}'
+        f'{_content_cell("• 채용 공고 자동 크롤링<br>• 직무 분포 시각화<br>• 지역별 연봉 집계")}'
+        f'{_content_cell("• 경력별 성장 곡선<br>• 기술 스택 프리미엄<br>• 시장가치 예측 모델")}'
+        f'{_content_cell("• 벡터 DB 의미 검색<br>• 조건 기반 필터링<br>• LLM 답변 생성")}'
+        '</tr>'
+        '<tr>'
+        f'{_label_cell("📌", "어디를 봐야 하나")}'
+        f'{_content_cell("직무 편중도 ·<br>지역 간 연봉 격차")}'
+        f'{_content_cell("최대 성장 구간 ·<br>기술 개수 효과")}'
+        f'{_content_cell("자연어 질문으로<br>필요한 공고 즉시 탐색")}'
+        '</tr>'
+        '<tr>'
+        f'{_label_cell("💼", "비즈니스 활용")}'
+        f'{_content_cell("→ 공급/수요 미스매치 파악<br>→ 지역 이동 ROI 판단", color=C_MARKET, bold=True)}'
+        f'{_content_cell("→ 개인 커리어 설계<br>→ 연봉 협상 근거", color=C_REPORT, bold=True)}'
+        f'{_content_cell("→ 구직자 셀프 서비스<br>→ HR 매칭 자동화", color=C_SEARCH, bold=True)}'
+        '</tr>'
+        '</table>'
+    )
+    st.markdown(table_html, unsafe_allow_html=True)
+
+    st.markdown("")
+    st.caption("👉 위 탭에서 **시장 현황 / 데이터 분석가 리포트 / 커리어 검색** 을 선택해 상세 분석을 확인하세요.")
+
+    # ---------- 상세 탭 (접이식) ----------
+    st.markdown("")
+    itab1, itab2, itab3 = st.tabs([
+        "🤖 자동화한 것",
+        "🎯 타겟 사용자",
+        "💼 비즈니스 활용 상세",
+    ])
+
+    with itab1:
+        st.caption("엔지니어 관점(잘 돌아간다)이 아니라, 분석가 관점(어떤 반복 업무를 코드로 녹였나)을 보여줍니다.")
+        auto_df = pd.DataFrame({
+            "단계": ["수집", "정제", "통합", "탐색", "해석", "추천"],
+            "기존 수작업": [
+                "채용 공고 사이트 일일이 복붙",
+                "엑셀 필터·지역 통일 수동",
+                "국내·해외 데이터 분리",
+                "키워드 검색 후 결과 읽기",
+                "개별 수치 해석 어려움",
+                "본인이 조건 수동 비교",
+            ],
+            "Career-Insight": [
+                "Selenium 자동 크롤링 파이프라인",
+                "지역·직무·연봉 파싱 자동화",
+                "Kaggle 4,390명 + 국내 공고 통합",
+                "벡터 DB 기반 의미 검색 (RAG)",
+                "경력·기술·지역 교차 분석 자동 제공",
+                "LLM이 맥락 기반 답변 생성",
+            ],
+        })
+        st.dataframe(auto_df, use_container_width=True, hide_index=True)
+        st.success("⏱️ **Before → After**: 공고 10개 수동 비교 30분 → Career-Insight **10초**.")
+
+    with itab2:
+        st.caption("이 플랫폼이 실제로 도움이 되는 사용자 그룹입니다.")
+        u1, u2, u3, u4 = st.columns(4)
+        user_card = (
+            "padding:16px;border-radius:10px;height:150px;"
+            "background:rgba(255,255,255,0.03);"
+            "border:1px solid rgba(255,255,255,0.1);"
+        )
+        with u1:
+            st.markdown(f'<div style="{user_card}"><div style="font-size:22px;">🎓</div>'
+                        '<b style="color:#638cff;">취업 준비생</b><br>'
+                        '<span style="color:#c9d1e8;font-size:12.5px;">직무별 연봉·진입 난이도 비교로 첫 커리어 방향 설정</span></div>',
+                        unsafe_allow_html=True)
+        with u2:
+            st.markdown(f'<div style="{user_card}"><div style="font-size:22px;">💼</div>'
+                        '<b style="color:#34d399;">주니어 분석가</b><br>'
+                        '<span style="color:#c9d1e8;font-size:12.5px;">다음 커리어 단계·필요 기술 스택 로드맵 확인</span></div>',
+                        unsafe_allow_html=True)
+        with u3:
+            st.markdown(f'<div style="{user_card}"><div style="font-size:22px;">🔄</div>'
+                        '<b style="color:#fbbf24;">이직 고민자</b><br>'
+                        '<span style="color:#c9d1e8;font-size:12.5px;">지역·연봉 협상의 데이터 기반 근거 확보</span></div>',
+                        unsafe_allow_html=True)
+        with u4:
+            st.markdown(f'<div style="{user_card}"><div style="font-size:22px;">👔</div>'
+                        '<b style="color:#AFA9EC;">HR·채용 담당자</b><br>'
+                        '<span style="color:#c9d1e8;font-size:12.5px;">시장 공급·수요 현황과 경쟁 포지션 파악</span></div>',
+                        unsafe_allow_html=True)
+
+    with itab3:
+        st.caption("현업·구직 현장에 도입됐을 때 만들어낼 수 있는 임팩트와 확장 로드맵입니다.")
+
+        biz_card = (
+            "padding:18px;border-radius:12px;height:100%;"
+            "background:rgba(255,255,255,0.03);"
+            "border:1px solid rgba(175,169,236,0.2);"
+        )
+
+        # 1. 시장 현황
+        st.markdown("#### 📊 1. 국내 채용 시장 분석")
+        st.markdown("*직무·지역·연봉의 구조적 흐름을 실시간 추적합니다.*")
+        b1, b2, b3 = st.columns(3)
+        with b1:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#638cff;font-weight:700;">🎯 즉시 효과</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">시장 현황 한눈에</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '직무·지역·연봉 분포를<br>단일 대시보드에서 즉시 확인</div></div>',
+                        unsafe_allow_html=True)
+        with b2:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#34d399;font-weight:700;">🔁 운영 체계화</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">트렌드 정기 추적</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '주간 크롤링 자동화로<br><b>시장 트렌드 변화 추적</b></div></div>',
+                        unsafe_allow_html=True)
+        with b3:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#fbbf24;font-weight:700;">🚀 고도화 확장</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">JD NLP 분석</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        'NLP로 공고 본문에서<br><b>요구 기술·경력 자동 추출</b></div></div>',
+                        unsafe_allow_html=True)
+
+        st.markdown("")
+
+        # 2. DA 리포트
+        st.markdown("#### 📑 2. Kaggle 기반 DA 리포트")
+        st.markdown("*글로벌 실데이터로 내 시장가치를 객관화합니다.*")
+        b1, b2, b3 = st.columns(3)
+        with b1:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#638cff;font-weight:700;">🎯 즉시 효과</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">시장가치 벤치마킹</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '글로벌 4,390명 데이터로<br><b>내 위치를 객관적으로 확인</b></div></div>',
+                        unsafe_allow_html=True)
+        with b2:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#34d399;font-weight:700;">🔁 운영 체계화</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">리포트 자동 갱신</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '매년 새 설문 반영으로<br><b>리포트 주기적 업데이트</b></div></div>',
+                        unsafe_allow_html=True)
+        with b3:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#fbbf24;font-weight:700;">🚀 고도화 확장</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">개인별 연봉 예측</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        'ML 회귀 모델로<br><b>개인별 연봉 구간 예측</b></div></div>',
+                        unsafe_allow_html=True)
+
+        st.markdown("")
+
+        # 3. RAG 검색
+        st.markdown("#### 🤖 3. RAG 기반 AI 커리어 검색")
+        st.markdown("*자연어 한 줄로 맞춤 공고를 즉시 탐색합니다.*")
+        b1, b2, b3 = st.columns(3)
+        with b1:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#638cff;font-weight:700;">🎯 즉시 효과</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">자연어 검색</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '"강남 DA 신입" 한 줄로<br><b>맞춤 공고 즉시 탐색</b></div></div>',
+                        unsafe_allow_html=True)
+        with b2:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#34d399;font-weight:700;">🔁 운영 체계화</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">벡터 DB 증분 갱신</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '공고 업데이트 시<br><b>벡터 DB 자동 재인덱싱</b></div></div>',
+                        unsafe_allow_html=True)
+        with b3:
+            st.markdown(f'<div style="{biz_card}">'
+                        '<div style="color:#fbbf24;font-weight:700;">🚀 고도화 확장</div>'
+                        '<div style="color:#fff;font-weight:600;margin:6px 0;">대화형 코치</div>'
+                        '<div style="color:#c9d1e8;font-size:13px;line-height:1.6;">'
+                        '대화형 에이전트로<br><b>이력서 리뷰·면접 코칭</b></div></div>',
+                        unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.markdown("#### 🎯 3가지 시스템의 공통 지향점")
+        st.markdown("> **\"구직자가 데이터팀 없이도 데이터 기반으로 커리어를 설계할 수 있는 환경을 만든다.\"**")
+        g1, g2, g3 = st.columns(3)
+        with g1:
+            st.success("🔓 **탈정보비대칭**\n\n채용 공고·급여 정보를\n투명하게 공개")
+        with g2:
+            st.success("🔁 **체계화**\n\n일회성 검색 → 지속 추적 →\n판단 근거 축적")
+        with g3:
+            st.success("🧠 **예측화**\n\n과거 데이터 → 미래 커리어\n경로 제안")
+
+    st.empty()  # 이 탭에서는 아래 기존 분기들이 실행되지 않도록 마커
+
+elif st.session_state.active_tab == "시장 현황":
     df_market = get_market_data()
     if df_market is not None:
         st.markdown("<div class='section-label'><h2 class='section-title'>전체 채용 시장 현황</h2></div>", unsafe_allow_html=True)
