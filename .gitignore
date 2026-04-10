@@ -1,12 +1,30 @@
+# API 키 및 환경 변수
 .env
+.env.*
+!.env.example
 .streamlit/secrets.toml
+
+# AI 도구 설정
+.claude/
+.cursor/
+
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
 dist/
 build/
+
+# IDE
 .vscode/
 .idea/
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Crawl progress/backup
+data/raw/_crawl_progress*.txt
+data/raw/*_backup.json
